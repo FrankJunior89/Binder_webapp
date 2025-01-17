@@ -1,0 +1,3621 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "optical-stand",
+   "metadata": {
+    "id": "optical-stand",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "# Visualisation - du notebook à la webapp\n",
+    "\n",
+    "L'objectif de ce TD est de :\n",
+    "- Créer son premier widget\n",
+    "- Ajouter des éléments d'interactivité à un graphique Plotly\n",
+    "- transfomer le notebook de visualisation interactive en webapp (application web) avec Voilà\n",
+    "- déployer et partager cette application web avec ngrok ou binder"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "atmospheric-piano",
+   "metadata": {
+    "id": "atmospheric-piano",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "# 1) Création d'un premier widget"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "sought-patient",
+   "metadata": {
+    "id": "sought-patient",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "a) Installation de la librairie Pywi"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "smaller-freeze",
+   "metadata": {
+    "id": "smaller-freeze",
+    "tags": [
+     "hide"
+    ]
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Requirement already satisfied: networkx in /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages (3.4.2)\n",
+      "Collecting ipywidgets\n",
+      "  Using cached ipywidgets-8.1.5-py3-none-any.whl.metadata (2.3 kB)\n",
+      "Collecting statsmodels\n",
+      "  Downloading statsmodels-0.14.4-cp313-cp313-macosx_11_0_arm64.whl.metadata (9.2 kB)\n",
+      "Requirement already satisfied: comm>=0.1.3 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from ipywidgets) (0.2.2)\n",
+      "Requirement already satisfied: ipython>=6.1.0 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from ipywidgets) (8.31.0)\n",
+      "Requirement already satisfied: traitlets>=4.3.1 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from ipywidgets) (5.14.3)\n",
+      "Collecting widgetsnbextension~=4.0.12 (from ipywidgets)\n",
+      "  Using cached widgetsnbextension-4.0.13-py3-none-any.whl.metadata (1.6 kB)\n",
+      "Collecting jupyterlab-widgets~=3.0.12 (from ipywidgets)\n",
+      "  Using cached jupyterlab_widgets-3.0.13-py3-none-any.whl.metadata (4.1 kB)\n",
+      "Requirement already satisfied: numpy<3,>=1.22.3 in /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages (from statsmodels) (2.2.1)\n",
+      "Requirement already satisfied: scipy!=1.9.2,>=1.8 in /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages (from statsmodels) (1.15.0)\n",
+      "Requirement already satisfied: pandas!=2.1.0,>=1.4 in /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages (from statsmodels) (2.2.3)\n",
+      "Collecting patsy>=0.5.6 (from statsmodels)\n",
+      "  Downloading patsy-1.0.1-py2.py3-none-any.whl.metadata (3.3 kB)\n",
+      "Requirement already satisfied: packaging>=21.3 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from statsmodels) (24.2)\n",
+      "Requirement already satisfied: decorator in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from ipython>=6.1.0->ipywidgets) (5.1.1)\n",
+      "Requirement already satisfied: jedi>=0.16 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from ipython>=6.1.0->ipywidgets) (0.19.2)\n",
+      "Requirement already satisfied: matplotlib-inline in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from ipython>=6.1.0->ipywidgets) (0.1.7)\n",
+      "Requirement already satisfied: pexpect>4.3 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from ipython>=6.1.0->ipywidgets) (4.9.0)\n",
+      "Requirement already satisfied: prompt_toolkit<3.1.0,>=3.0.41 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from ipython>=6.1.0->ipywidgets) (3.0.48)\n",
+      "Requirement already satisfied: pygments>=2.4.0 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from ipython>=6.1.0->ipywidgets) (2.19.1)\n",
+      "Requirement already satisfied: stack_data in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from ipython>=6.1.0->ipywidgets) (0.6.3)\n",
+      "Requirement already satisfied: python-dateutil>=2.8.2 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from pandas!=2.1.0,>=1.4->statsmodels) (2.9.0.post0)\n",
+      "Requirement already satisfied: pytz>=2020.1 in /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages (from pandas!=2.1.0,>=1.4->statsmodels) (2024.2)\n",
+      "Requirement already satisfied: tzdata>=2022.7 in /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages (from pandas!=2.1.0,>=1.4->statsmodels) (2024.2)\n",
+      "Requirement already satisfied: parso<0.9.0,>=0.8.4 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from jedi>=0.16->ipython>=6.1.0->ipywidgets) (0.8.4)\n",
+      "Requirement already satisfied: ptyprocess>=0.5 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from pexpect>4.3->ipython>=6.1.0->ipywidgets) (0.7.0)\n",
+      "Requirement already satisfied: wcwidth in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from prompt_toolkit<3.1.0,>=3.0.41->ipython>=6.1.0->ipywidgets) (0.2.13)\n",
+      "Requirement already satisfied: six>=1.5 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from python-dateutil>=2.8.2->pandas!=2.1.0,>=1.4->statsmodels) (1.17.0)\n",
+      "Requirement already satisfied: executing>=1.2.0 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from stack_data->ipython>=6.1.0->ipywidgets) (2.1.0)\n",
+      "Requirement already satisfied: asttokens>=2.1.0 in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from stack_data->ipython>=6.1.0->ipywidgets) (3.0.0)\n",
+      "Requirement already satisfied: pure-eval in /Users/fngnigue/Library/Python/3.13/lib/python/site-packages (from stack_data->ipython>=6.1.0->ipywidgets) (0.2.3)\n",
+      "Using cached ipywidgets-8.1.5-py3-none-any.whl (139 kB)\n",
+      "Downloading statsmodels-0.14.4-cp313-cp313-macosx_11_0_arm64.whl (9.9 MB)\n",
+      "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m9.9/9.9 MB\u001b[0m \u001b[31m8.1 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m00:01\u001b[0m00:01\u001b[0m\n",
+      "\u001b[?25hUsing cached jupyterlab_widgets-3.0.13-py3-none-any.whl (214 kB)\n",
+      "Downloading patsy-1.0.1-py2.py3-none-any.whl (232 kB)\n",
+      "Using cached widgetsnbextension-4.0.13-py3-none-any.whl (2.3 MB)\n",
+      "Installing collected packages: widgetsnbextension, patsy, jupyterlab-widgets, statsmodels, ipywidgets\n",
+      "Successfully installed ipywidgets-8.1.5 jupyterlab-widgets-3.0.13 patsy-1.0.1 statsmodels-0.14.4 widgetsnbextension-4.0.13\n"
+     ]
+    }
+   ],
+   "source": [
+    "import sys\n",
+    "!{sys.executable} -m pip install networkx ipywidgets statsmodels"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "entire-broadway",
+   "metadata": {
+    "id": "entire-broadway",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "b) Exécutez le code ci-dessous pour importer la librairie et la renommer widgets. On utilsera"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "natural-bedroom",
+   "metadata": {
+    "id": "natural-bedroom"
+   },
+   "outputs": [],
+   "source": [
+    "import ipywidgets as widgets\n",
+    "from IPython.display import display"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "controlling-deputy",
+   "metadata": {
+    "id": "controlling-deputy",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "c) La liste complète des widgets disponible est disponible à [cette adresse](https://ipywidgets.readthedocs.io/en/latest/examples/Widget%20List.html).\n",
+    "\n",
+    "A l'aide de cette documentation, construisez une variable `my_int_slider` qui contiendra un widget \"IntSlider\" avec 5 comme valeur par défaut, 1 en minimum et 20 en maximum. On pourra laisser step égal à 1 comme niveau d'incrément.\n",
+    "\n",
+    "Utilisez la fonction \"display\" pour l'afficher.\n",
+    "        "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "complimentary-parameter",
+   "metadata": {
+    "id": "complimentary-parameter"
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "d85161feb37f4e20b8e936c7339189fa",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "IntSlider(value=1, max=10, min=1)"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "my_int_slider = widgets.IntSlider(\n",
+    "    value=1,\n",
+    "    min=1,\n",
+    "    max=10,\n",
+    "    step=1\n",
+    ")\n",
+    "\n",
+    "display(my_int_slider)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "touched-oregon",
+   "metadata": {
+    "id": "touched-oregon",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "d) A quoi corresponnd le résultat de cette opération ?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "classified-harbor",
+   "metadata": {
+    "id": "classified-harbor",
+    "tags": [
+     "hide"
+    ]
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['_dom_classes',\n",
+       " '_model_module',\n",
+       " '_model_module_version',\n",
+       " '_model_name',\n",
+       " '_view_count',\n",
+       " '_view_module',\n",
+       " '_view_module_version',\n",
+       " '_view_name',\n",
+       " 'behavior',\n",
+       " 'continuous_update',\n",
+       " 'description',\n",
+       " 'description_allow_html',\n",
+       " 'disabled',\n",
+       " 'layout',\n",
+       " 'max',\n",
+       " 'min',\n",
+       " 'orientation',\n",
+       " 'readout',\n",
+       " 'readout_format',\n",
+       " 'step',\n",
+       " 'style',\n",
+       " 'tabbable',\n",
+       " 'tooltip',\n",
+       " 'value']"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "my_int_slider.keys"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "essential-brown",
+   "metadata": {
+    "id": "essential-brown",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "e) En déduire comment afficher la valeur du slider.\n",
+    "\n",
+    "Faites varier la valeur du slider et vérifier qu'en exécutant de nouveau la ligne de code, la valeur a bien changé."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "sufficient-default",
+   "metadata": {
+    "id": "sufficient-default",
+    "tags": [
+     "hide"
+    ]
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "5"
+      ]
+     },
+     "execution_count": 12,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "my_int_slider.value"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "outside-michael",
+   "metadata": {
+    "id": "outside-michael",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "# 2) Création d'un User Form"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "inner-message",
+   "metadata": {
+    "id": "inner-message",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "Les widgets peuvent servir à créer des user forms pour des utilisateurs finaux.\n",
+    "\n",
+    "Cet exercice a pour but de construire un outil qui permet de sélectionner de sélectionner un indice boursier pour afficher un scatter plot avec l'indice d'apple AAPL."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "crucial-process",
+   "metadata": {
+    "id": "crucial-process",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "a) Importez les librairies suivantes"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "terminal-consistency",
+   "metadata": {
+    "id": "terminal-consistency"
+   },
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import plotly.express as px\n",
+    "from ipywidgets import interact, interactive, fixed, interactive_output\n",
+    "import io"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "focal-lotus",
+   "metadata": {
+    "id": "focal-lotus",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "b) Dans une variable `my_upload_widget`, créez un widget de type Fileupload qui accepte l'extension .csv et un seul fichier à la fois. Puis testez l'import de ce fichier [csv exemple](https://drive.google.com/file/d/1mci2f7Jn4mqjS75Yvv73c6-bsraPutDj/view?usp=sharing)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "composed-absorption",
+   "metadata": {
+    "id": "composed-absorption",
+    "tags": [
+     "hide"
+    ]
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "67778f8c0959472c8bd8eea3745688d0",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "FileUpload(value=(), accept='.csv', description='Upload')"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "my_upload_widget =widgets.FileUpload(\n",
+    "    accept='.csv',  \n",
+    "    multiple=False\n",
+    ")\n",
+    "\n",
+    "\n",
+    "display(my_upload_widget)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "fa83ee8b",
+   "metadata": {
+     "id": "fa83ee8b",
+    "tags": [
+    "hide"
+   ]
+
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<memory at 0x10e259180>"
+      ]
+     },
+     "execution_count": 23,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "my_upload_widget.value[0]['content']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "mechanical-schedule",
+   "metadata": {
+    "id": "mechanical-schedule",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "c) Le données en sortie sont un peu difficile à extraire."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "numeric-direction",
+   "metadata": {
+    "id": "numeric-direction",
+    "tags": [
+     "hide"
+    ]
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>date</th>\n",
+       "      <th>GOOG</th>\n",
+       "      <th>AAPL</th>\n",
+       "      <th>AMZN</th>\n",
+       "      <th>FB</th>\n",
+       "      <th>NFLX</th>\n",
+       "      <th>MSFT</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>2018-01-01</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2018-01-08</td>\n",
+       "      <td>1.018172</td>\n",
+       "      <td>1.011943</td>\n",
+       "      <td>1.061881</td>\n",
+       "      <td>0.959968</td>\n",
+       "      <td>1.053526</td>\n",
+       "      <td>1.015988</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2018-01-15</td>\n",
+       "      <td>1.032008</td>\n",
+       "      <td>1.019771</td>\n",
+       "      <td>1.053240</td>\n",
+       "      <td>0.970243</td>\n",
+       "      <td>1.049860</td>\n",
+       "      <td>1.020524</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>2018-01-22</td>\n",
+       "      <td>1.066783</td>\n",
+       "      <td>0.980057</td>\n",
+       "      <td>1.140676</td>\n",
+       "      <td>1.016858</td>\n",
+       "      <td>1.307681</td>\n",
+       "      <td>1.066561</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>2018-01-29</td>\n",
+       "      <td>1.008773</td>\n",
+       "      <td>0.917143</td>\n",
+       "      <td>1.163374</td>\n",
+       "      <td>1.018357</td>\n",
+       "      <td>1.273537</td>\n",
+       "      <td>1.040708</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>100</th>\n",
+       "      <td>2019-12-02</td>\n",
+       "      <td>1.216280</td>\n",
+       "      <td>1.546914</td>\n",
+       "      <td>1.425061</td>\n",
+       "      <td>1.075997</td>\n",
+       "      <td>1.463641</td>\n",
+       "      <td>1.720717</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>101</th>\n",
+       "      <td>2019-12-09</td>\n",
+       "      <td>1.222821</td>\n",
+       "      <td>1.572286</td>\n",
+       "      <td>1.432660</td>\n",
+       "      <td>1.038855</td>\n",
+       "      <td>1.421496</td>\n",
+       "      <td>1.752239</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>102</th>\n",
+       "      <td>2019-12-16</td>\n",
+       "      <td>1.224418</td>\n",
+       "      <td>1.596800</td>\n",
+       "      <td>1.453455</td>\n",
+       "      <td>1.104094</td>\n",
+       "      <td>1.604362</td>\n",
+       "      <td>1.784896</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>103</th>\n",
+       "      <td>2019-12-23</td>\n",
+       "      <td>1.226504</td>\n",
+       "      <td>1.656000</td>\n",
+       "      <td>1.521226</td>\n",
+       "      <td>1.113728</td>\n",
+       "      <td>1.567170</td>\n",
+       "      <td>1.802472</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>104</th>\n",
+       "      <td>2019-12-30</td>\n",
+       "      <td>1.213014</td>\n",
+       "      <td>1.678000</td>\n",
+       "      <td>1.503360</td>\n",
+       "      <td>1.098475</td>\n",
+       "      <td>1.540883</td>\n",
+       "      <td>1.788185</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>105 rows × 7 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "           date      GOOG      AAPL      AMZN        FB      NFLX      MSFT\n",
+       "0    2018-01-01  1.000000  1.000000  1.000000  1.000000  1.000000  1.000000\n",
+       "1    2018-01-08  1.018172  1.011943  1.061881  0.959968  1.053526  1.015988\n",
+       "2    2018-01-15  1.032008  1.019771  1.053240  0.970243  1.049860  1.020524\n",
+       "3    2018-01-22  1.066783  0.980057  1.140676  1.016858  1.307681  1.066561\n",
+       "4    2018-01-29  1.008773  0.917143  1.163374  1.018357  1.273537  1.040708\n",
+       "..          ...       ...       ...       ...       ...       ...       ...\n",
+       "100  2019-12-02  1.216280  1.546914  1.425061  1.075997  1.463641  1.720717\n",
+       "101  2019-12-09  1.222821  1.572286  1.432660  1.038855  1.421496  1.752239\n",
+       "102  2019-12-16  1.224418  1.596800  1.453455  1.104094  1.604362  1.784896\n",
+       "103  2019-12-23  1.226504  1.656000  1.521226  1.113728  1.567170  1.802472\n",
+       "104  2019-12-30  1.213014  1.678000  1.503360  1.098475  1.540883  1.788185\n",
+       "\n",
+       "[105 rows x 7 columns]"
+      ]
+     },
+     "execution_count": 26,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df = pd.read_csv(io.BytesIO(my_upload_widget.value[0]['content']))\n",
+    "df"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "equal-failing",
+   "metadata": {
+    "id": "equal-failing",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "d) Représentez dans un graphique Plotly Scatter les donnnées de GOOG versus APPL avec une courbe de tendance (trendlines='ols') pour voir la corrélation entre ces deux indices."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "id": "solved-logic",
+   "metadata": {
+    "id": "solved-logic",
+    "tags": [
+     "hide"
+    ]
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.plotly.v1+json": {
+       "config": {
+        "plotlyServerURL": "https://plot.ly"
+       },
+       "data": [
+        {
+         "hovertemplate": "GOOG=%{x}<br>AAPL=%{y}<extra></extra>",
+         "legendgroup": "",
+         "marker": {
+          "color": "#636efa",
+          "symbol": "circle"
+         },
+         "mode": "markers",
+         "name": "",
+         "orientation": "v",
+         "showlegend": false,
+         "type": "scatter",
+         "x": [
+          1,
+          1.018172278347936,
+          1.032007866452698,
+          1.066782783389724,
+          1.0087731636550117,
+          0.9415276737437316,
+          0.99325918262539,
+          1.0222821547641083,
+          0.9788520214265992,
+          1.0524482730908842,
+          1.0303929312465263,
+          0.926821104067592,
+          0.9360932452590338,
+          0.913638710861412,
+          0.93380695379017,
+          0.9734447261178653,
+          0.9345146364100892,
+          0.9509902470625956,
+          0.9963982380519172,
+          0.9674568868105002,
+          0.9758943718805396,
+          1.015668254641377,
+          1.0169111849053498,
+          1.0453898287179595,
+          1.0483111519067918,
+          1.0121753574512644,
+          1.0344211867653972,
+          1.0785588920381208,
+          1.075011617811375,
+          1.1236312044424703,
+          1.1102129167272332,
+          1.1228237368393843,
+          1.0895729410299655,
+          1.1074367837463466,
+          1.1052048693141154,
+          1.0567939333314087,
+          1.0637798374890872,
+          1.0579370795194665,
+          1.0827776350267664,
+          1.0500077089175164,
+          1.007121903906116,
+          0.9947651405743836,
+          0.9720929301886708,
+          0.959681788913054,
+          0.9672663993407256,
+          0.9630385756700248,
+          0.9289168536315806,
+          0.992923504040418,
+          0.9404389054995582,
+          0.945446952912676,
+          0.8886892896888904,
+          0.9408925313390586,
+          0.9714034098401132,
+          0.9591373489949891,
+          0.9963982380519172,
+          0.989802500200548,
+          1.0077298024501202,
+          0.9934950771344468,
+          1.0103608540932627,
+          1.0073850422758417,
+          1.035165084150587,
+          1.0363716889645844,
+          1.0746032883264525,
+          1.0936918990354445,
+          1.064487521016258,
+          1.095188886079836,
+          1.1049145977684258,
+          1.1216987538299403,
+          1.1541874899828073,
+          1.075456162061569,
+          1.0562859304552756,
+          1.0544986709579427,
+          1.0283425342867192,
+          1.001270175031893,
+          0.9671666152648106,
+          0.98468558802946,
+          1.0178275181736574,
+          0.980657443195294,
+          1.0266368965939394,
+          1.0387124690620373,
+          1.025285100664745,
+          1.1344366027859267,
+          1.0832494231376286,
+          1.0778240762422375,
+          1.068379555417282,
+          1.0445098208996275,
+          1.0779056980467905,
+          1.0931748145700046,
+          1.12459294475006,
+          1.115856106545024,
+          1.1114649285805127,
+          1.0968672799119472,
+          1.10271900878617,
+          1.129972884606169,
+          1.1477913211905195,
+          1.155602744537941,
+          1.189742629754999,
+          1.2110630442115171,
+          1.1751993590303178,
+          1.183927115646047,
+          1.216279741365772,
+          1.222820990588552,
+          1.22441776261611,
+          1.2265044859331442,
+          1.213013658002661
+         ],
+         "xaxis": "x",
+         "y": [
+          1,
+          1.0119428342857142,
+          1.0197714685714288,
+          0.9800571142857144,
+          0.9171428571428571,
+          0.8937714514285715,
+          0.9853142457142856,
+          1.002857142857143,
+          1.006914325714286,
+          1.02845712,
+          1.0172571657142857,
+          0.9425142971428572,
+          0.9587428514285714,
+          0.9621714571428572,
+          0.99845712,
+          0.9469714342857144,
+          0.9275428971428572,
+          1.0504571542857144,
+          1.07765712,
+          1.06462856,
+          1.0776000114285715,
+          1.0870857428571428,
+          1.0954285542857145,
+          1.0790856914285714,
+          1.0566857028571428,
+          1.0577714342857143,
+          1.0741142914285715,
+          1.093314297142857,
+          1.0939428685714283,
+          1.0913142628571428,
+          1.1885143142857142,
+          1.1858857085714285,
+          1.2433142971428572,
+          1.235200022857143,
+          1.3007428857142855,
+          1.2645714457142856,
+          1.279085691428571,
+          1.2437714514285716,
+          1.2899428857142856,
+          1.2816571028571428,
+          1.2692000057142856,
+          1.253199988571429,
+          1.236000017142857,
+          1.1855999771428571,
+          1.1684000057142856,
+          1.1058857085714286,
+          0.9845142457142856,
+          1.0204571542857144,
+          0.9628000285714284,
+          0.9455999771428572,
+          0.8613142628571429,
+          0.8927428342857143,
+          0.8471999714285714,
+          0.8702285314285714,
+          0.8961143257142857,
+          0.9014856857142858,
+          0.95154288,
+          0.9737714514285716,
+          0.97382856,
+          0.9884000057142855,
+          0.9998285771428572,
+          0.9880571657142858,
+          1.0635428285714286,
+          1.0917143028571428,
+          1.0854285542857145,
+          1.1257142857142857,
+          1.1363999714285713,
+          1.1649142914285715,
+          1.1674285885714286,
+          1.21,
+          1.126742817142857,
+          1.08,
+          1.02268572,
+          1.00040004,
+          1.0865713942857145,
+          1.1013714571428572,
+          1.135885708571429,
+          1.130971417142857,
+          1.167028548571429,
+          1.1617143028571428,
+          1.15765712,
+          1.1870857428571429,
+          1.1658285942857145,
+          1.1485143142857142,
+          1.18,
+          1.1579428514285717,
+          1.1928000285714286,
+          1.218628542857143,
+          1.25,
+          1.2441714057142856,
+          1.25040004,
+          1.2971999714285716,
+          1.3497714685714286,
+          1.3509143085714286,
+          1.409028582857143,
+          1.4618286114285712,
+          1.4865143714285716,
+          1.5186286285714288,
+          1.4958857085714288,
+          1.5271428571428571,
+          1.5469142342857145,
+          1.57228568,
+          1.5968000114285714,
+          1.6559999314285714,
+          1.6779999657142857
+         ],
+         "yaxis": "y"
+        },
+        {
+         "hovertemplate": "<b>OLS trendline</b><br>AAPL = 1.95191 * GOOG + -0.90356<br>R<sup>2</sup>=0.694937<br><br>GOOG=%{x}<br>AAPL=%{y} <b>(trend)</b><extra></extra>",
+         "legendgroup": "",
+         "marker": {
+          "color": "#636efa",
+          "symbol": "circle"
+         },
+         "mode": "lines",
+         "name": "",
+         "showlegend": false,
+         "type": "scatter",
+         "x": [
+          0.8886892896888904,
+          0.913638710861412,
+          0.926821104067592,
+          0.9289168536315806,
+          0.93380695379017,
+          0.9345146364100892,
+          0.9360932452590338,
+          0.9404389054995582,
+          0.9408925313390586,
+          0.9415276737437316,
+          0.945446952912676,
+          0.9509902470625956,
+          0.9591373489949891,
+          0.959681788913054,
+          0.9630385756700248,
+          0.9671666152648106,
+          0.9672663993407256,
+          0.9674568868105002,
+          0.9714034098401132,
+          0.9720929301886708,
+          0.9734447261178653,
+          0.9758943718805396,
+          0.9788520214265992,
+          0.980657443195294,
+          0.98468558802946,
+          0.989802500200548,
+          0.992923504040418,
+          0.99325918262539,
+          0.9934950771344468,
+          0.9947651405743836,
+          0.9963982380519172,
+          0.9963982380519172,
+          1,
+          1.001270175031893,
+          1.007121903906116,
+          1.0073850422758417,
+          1.0077298024501202,
+          1.0087731636550117,
+          1.0103608540932627,
+          1.0121753574512644,
+          1.015668254641377,
+          1.0169111849053498,
+          1.0178275181736574,
+          1.018172278347936,
+          1.0222821547641083,
+          1.025285100664745,
+          1.0266368965939394,
+          1.0283425342867192,
+          1.0303929312465263,
+          1.032007866452698,
+          1.0344211867653972,
+          1.035165084150587,
+          1.0363716889645844,
+          1.0387124690620373,
+          1.0445098208996275,
+          1.0453898287179595,
+          1.0483111519067918,
+          1.0500077089175164,
+          1.0524482730908842,
+          1.0544986709579427,
+          1.0562859304552756,
+          1.0567939333314087,
+          1.0579370795194665,
+          1.0637798374890872,
+          1.064487521016258,
+          1.066782783389724,
+          1.068379555417282,
+          1.0746032883264525,
+          1.075011617811375,
+          1.075456162061569,
+          1.0778240762422375,
+          1.0779056980467905,
+          1.0785588920381208,
+          1.0827776350267664,
+          1.0832494231376286,
+          1.0895729410299655,
+          1.0931748145700046,
+          1.0936918990354445,
+          1.095188886079836,
+          1.0968672799119472,
+          1.10271900878617,
+          1.1049145977684258,
+          1.1052048693141154,
+          1.1074367837463466,
+          1.1102129167272332,
+          1.1114649285805127,
+          1.115856106545024,
+          1.1216987538299403,
+          1.1228237368393843,
+          1.1236312044424703,
+          1.12459294475006,
+          1.129972884606169,
+          1.1344366027859267,
+          1.1477913211905195,
+          1.1541874899828073,
+          1.155602744537941,
+          1.1751993590303178,
+          1.183927115646047,
+          1.189742629754999,
+          1.2110630442115171,
+          1.213013658002661,
+          1.216279741365772,
+          1.222820990588552,
+          1.22441776261611,
+          1.2265044859331442
+         ],
+         "xaxis": "x",
+         "y": [
+          0.8310783215620523,
+          0.8797772608170551,
+          0.9055080608041248,
+          0.9095987681598043,
+          0.9191437868168426,
+          0.9205251171764113,
+          0.9236064141696589,
+          0.9320887369703681,
+          0.9329741722295499,
+          0.9342139108659522,
+          0.941863977649146,
+          0.9526839699532905,
+          0.9685863517907867,
+          0.9696490476471153,
+          0.9762011817924061,
+          0.9842587294236165,
+          0.9844534986175788,
+          0.984825312362485,
+          0.9925285566164743,
+          0.9938744359191365,
+          0.9965130152827935,
+          1.0012944949559226,
+          1.0070675505544942,
+          1.0105915651773327,
+          1.0184541275683776,
+          1.0284418620841365,
+          1.0345337700030204,
+          1.0351889832404626,
+          1.035649427283942,
+          1.038128472464341,
+          1.0413161261700508,
+          1.0413161261700508,
+          1.0483464290018394,
+          1.0508256919993115,
+          1.0622477200701024,
+          1.0627613415843782,
+          1.0634342812357087,
+          1.0654708248327198,
+          1.0685698482398558,
+          1.0721115892765836,
+          1.0789293982713912,
+          1.0813554820271971,
+          1.0831440789594495,
+          1.0838170186107805,
+          1.0918391134142131,
+          1.097700583265154,
+          1.1003391626288108,
+          1.103668408057687,
+          1.1076705913670244,
+          1.110822794015827,
+          1.1155333698042722,
+          1.1169853880023224,
+          1.1193405678734436,
+          1.1239095519387226,
+          1.1352254411141245,
+          1.136943134161692,
+          1.1426452841047081,
+          1.1459568048905657,
+          1.1507205581498066,
+          1.154722743230014,
+          1.1582113067959456,
+          1.1592028809505162,
+          1.1614341955123595,
+          1.1728387132154645,
+          1.1742200453459035,
+          1.1787001830664061,
+          1.1818169328874308,
+          1.1939650780803488,
+          1.1947620990871597,
+          1.1956298079324532,
+          1.2002517551931953,
+          1.2004110733302507,
+          1.2016860469773571,
+          1.2099206391595114,
+          1.2108415254756002,
+          1.2231844416333506,
+          1.2302149622822123,
+          1.231224262850672,
+          1.2341462417068643,
+          1.2374223096649448,
+          1.2488443377357354,
+          1.2531299223084789,
+          1.2536965052473472,
+          1.2580529937047746,
+          1.2634717459261249,
+          1.2659155560958197,
+          1.2744867252413052,
+          1.2858910268982076,
+          1.288086888632273,
+          1.2896629899566747,
+          1.2915402171875008,
+          1.302041357171332,
+          1.3107541180399847,
+          1.3368212807150535,
+          1.3493060046421732,
+          1.3520684493151074,
+          1.3903192100108717,
+          1.407354975543178,
+          1.418706315775487,
+          1.4603217729570344,
+          1.4641291888432795,
+          1.4705042784376263,
+          1.4832721858110784,
+          1.4863889356321032,
+          1.4904620245969955
+         ],
+         "yaxis": "y"
+        }
+       ],
+       "layout": {
+        "legend": {
+         "tracegroupgap": 0
+        },
+        "template": {
+         "data": {
+          "bar": [
+           {
+            "error_x": {
+             "color": "#2a3f5f"
+            },
+            "error_y": {
+             "color": "#2a3f5f"
+            },
+            "marker": {
+             "line": {
+              "color": "#E5ECF6",
+              "width": 0.5
+             },
+             "pattern": {
+              "fillmode": "overlay",
+              "size": 10,
+              "solidity": 0.2
+             }
+            },
+            "type": "bar"
+           }
+          ],
+          "barpolar": [
+           {
+            "marker": {
+             "line": {
+              "color": "#E5ECF6",
+              "width": 0.5
+             },
+             "pattern": {
+              "fillmode": "overlay",
+              "size": 10,
+              "solidity": 0.2
+             }
+            },
+            "type": "barpolar"
+           }
+          ],
+          "carpet": [
+           {
+            "aaxis": {
+             "endlinecolor": "#2a3f5f",
+             "gridcolor": "white",
+             "linecolor": "white",
+             "minorgridcolor": "white",
+             "startlinecolor": "#2a3f5f"
+            },
+            "baxis": {
+             "endlinecolor": "#2a3f5f",
+             "gridcolor": "white",
+             "linecolor": "white",
+             "minorgridcolor": "white",
+             "startlinecolor": "#2a3f5f"
+            },
+            "type": "carpet"
+           }
+          ],
+          "choropleth": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "type": "choropleth"
+           }
+          ],
+          "contour": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "contour"
+           }
+          ],
+          "contourcarpet": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "type": "contourcarpet"
+           }
+          ],
+          "heatmap": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "heatmap"
+           }
+          ],
+          "heatmapgl": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "heatmapgl"
+           }
+          ],
+          "histogram": [
+           {
+            "marker": {
+             "pattern": {
+              "fillmode": "overlay",
+              "size": 10,
+              "solidity": 0.2
+             }
+            },
+            "type": "histogram"
+           }
+          ],
+          "histogram2d": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "histogram2d"
+           }
+          ],
+          "histogram2dcontour": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "histogram2dcontour"
+           }
+          ],
+          "mesh3d": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "type": "mesh3d"
+           }
+          ],
+          "parcoords": [
+           {
+            "line": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "parcoords"
+           }
+          ],
+          "pie": [
+           {
+            "automargin": true,
+            "type": "pie"
+           }
+          ],
+          "scatter": [
+           {
+            "fillpattern": {
+             "fillmode": "overlay",
+             "size": 10,
+             "solidity": 0.2
+            },
+            "type": "scatter"
+           }
+          ],
+          "scatter3d": [
+           {
+            "line": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scatter3d"
+           }
+          ],
+          "scattercarpet": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scattercarpet"
+           }
+          ],
+          "scattergeo": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scattergeo"
+           }
+          ],
+          "scattergl": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scattergl"
+           }
+          ],
+          "scattermapbox": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scattermapbox"
+           }
+          ],
+          "scatterpolar": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scatterpolar"
+           }
+          ],
+          "scatterpolargl": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scatterpolargl"
+           }
+          ],
+          "scatterternary": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scatterternary"
+           }
+          ],
+          "surface": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "surface"
+           }
+          ],
+          "table": [
+           {
+            "cells": {
+             "fill": {
+              "color": "#EBF0F8"
+             },
+             "line": {
+              "color": "white"
+             }
+            },
+            "header": {
+             "fill": {
+              "color": "#C8D4E3"
+             },
+             "line": {
+              "color": "white"
+             }
+            },
+            "type": "table"
+           }
+          ]
+         },
+         "layout": {
+          "annotationdefaults": {
+           "arrowcolor": "#2a3f5f",
+           "arrowhead": 0,
+           "arrowwidth": 1
+          },
+          "autotypenumbers": "strict",
+          "coloraxis": {
+           "colorbar": {
+            "outlinewidth": 0,
+            "ticks": ""
+           }
+          },
+          "colorscale": {
+           "diverging": [
+            [
+             0,
+             "#8e0152"
+            ],
+            [
+             0.1,
+             "#c51b7d"
+            ],
+            [
+             0.2,
+             "#de77ae"
+            ],
+            [
+             0.3,
+             "#f1b6da"
+            ],
+            [
+             0.4,
+             "#fde0ef"
+            ],
+            [
+             0.5,
+             "#f7f7f7"
+            ],
+            [
+             0.6,
+             "#e6f5d0"
+            ],
+            [
+             0.7,
+             "#b8e186"
+            ],
+            [
+             0.8,
+             "#7fbc41"
+            ],
+            [
+             0.9,
+             "#4d9221"
+            ],
+            [
+             1,
+             "#276419"
+            ]
+           ],
+           "sequential": [
+            [
+             0,
+             "#0d0887"
+            ],
+            [
+             0.1111111111111111,
+             "#46039f"
+            ],
+            [
+             0.2222222222222222,
+             "#7201a8"
+            ],
+            [
+             0.3333333333333333,
+             "#9c179e"
+            ],
+            [
+             0.4444444444444444,
+             "#bd3786"
+            ],
+            [
+             0.5555555555555556,
+             "#d8576b"
+            ],
+            [
+             0.6666666666666666,
+             "#ed7953"
+            ],
+            [
+             0.7777777777777778,
+             "#fb9f3a"
+            ],
+            [
+             0.8888888888888888,
+             "#fdca26"
+            ],
+            [
+             1,
+             "#f0f921"
+            ]
+           ],
+           "sequentialminus": [
+            [
+             0,
+             "#0d0887"
+            ],
+            [
+             0.1111111111111111,
+             "#46039f"
+            ],
+            [
+             0.2222222222222222,
+             "#7201a8"
+            ],
+            [
+             0.3333333333333333,
+             "#9c179e"
+            ],
+            [
+             0.4444444444444444,
+             "#bd3786"
+            ],
+            [
+             0.5555555555555556,
+             "#d8576b"
+            ],
+            [
+             0.6666666666666666,
+             "#ed7953"
+            ],
+            [
+             0.7777777777777778,
+             "#fb9f3a"
+            ],
+            [
+             0.8888888888888888,
+             "#fdca26"
+            ],
+            [
+             1,
+             "#f0f921"
+            ]
+           ]
+          },
+          "colorway": [
+           "#636efa",
+           "#EF553B",
+           "#00cc96",
+           "#ab63fa",
+           "#FFA15A",
+           "#19d3f3",
+           "#FF6692",
+           "#B6E880",
+           "#FF97FF",
+           "#FECB52"
+          ],
+          "font": {
+           "color": "#2a3f5f"
+          },
+          "geo": {
+           "bgcolor": "white",
+           "lakecolor": "white",
+           "landcolor": "#E5ECF6",
+           "showlakes": true,
+           "showland": true,
+           "subunitcolor": "white"
+          },
+          "hoverlabel": {
+           "align": "left"
+          },
+          "hovermode": "closest",
+          "mapbox": {
+           "style": "light"
+          },
+          "paper_bgcolor": "white",
+          "plot_bgcolor": "#E5ECF6",
+          "polar": {
+           "angularaxis": {
+            "gridcolor": "white",
+            "linecolor": "white",
+            "ticks": ""
+           },
+           "bgcolor": "#E5ECF6",
+           "radialaxis": {
+            "gridcolor": "white",
+            "linecolor": "white",
+            "ticks": ""
+           }
+          },
+          "scene": {
+           "xaxis": {
+            "backgroundcolor": "#E5ECF6",
+            "gridcolor": "white",
+            "gridwidth": 2,
+            "linecolor": "white",
+            "showbackground": true,
+            "ticks": "",
+            "zerolinecolor": "white"
+           },
+           "yaxis": {
+            "backgroundcolor": "#E5ECF6",
+            "gridcolor": "white",
+            "gridwidth": 2,
+            "linecolor": "white",
+            "showbackground": true,
+            "ticks": "",
+            "zerolinecolor": "white"
+           },
+           "zaxis": {
+            "backgroundcolor": "#E5ECF6",
+            "gridcolor": "white",
+            "gridwidth": 2,
+            "linecolor": "white",
+            "showbackground": true,
+            "ticks": "",
+            "zerolinecolor": "white"
+           }
+          },
+          "shapedefaults": {
+           "line": {
+            "color": "#2a3f5f"
+           }
+          },
+          "ternary": {
+           "aaxis": {
+            "gridcolor": "white",
+            "linecolor": "white",
+            "ticks": ""
+           },
+           "baxis": {
+            "gridcolor": "white",
+            "linecolor": "white",
+            "ticks": ""
+           },
+           "bgcolor": "#E5ECF6",
+           "caxis": {
+            "gridcolor": "white",
+            "linecolor": "white",
+            "ticks": ""
+           }
+          },
+          "title": {
+           "x": 0.05
+          },
+          "xaxis": {
+           "automargin": true,
+           "gridcolor": "white",
+           "linecolor": "white",
+           "ticks": "",
+           "title": {
+            "standoff": 15
+           },
+           "zerolinecolor": "white",
+           "zerolinewidth": 2
+          },
+          "yaxis": {
+           "automargin": true,
+           "gridcolor": "white",
+           "linecolor": "white",
+           "ticks": "",
+           "title": {
+            "standoff": 15
+           },
+           "zerolinecolor": "white",
+           "zerolinewidth": 2
+          }
+         }
+        },
+        "title": {
+         "text": "Relation entre GDP per capita et Life Expectancy en 2007"
+        },
+        "xaxis": {
+         "anchor": "y",
+         "domain": [
+          0,
+          1
+         ],
+         "title": {
+          "text": "GOOG"
+         }
+        },
+        "yaxis": {
+         "anchor": "x",
+         "domain": [
+          0,
+          1
+         ],
+         "title": {
+          "text": "AAPL"
+         }
+        }
+       }
+      }
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "fig = px.scatter(\n",
+    "    df,\n",
+    "    x='GOOG',\n",
+    "    y='AAPL',\n",
+    "    trendline='ols',\n",
+    "    title=\"Relation entre GDP per capita et Life Expectancy en 2007\"\n",
+    ")\n",
+    "fig.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "outer-paste",
+   "metadata": {
+    "id": "outer-paste",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "e) Créez une fonction `financial_scatter_widget` qui prendra en entrée les paramètres df, x et y, elle affichera le graphique créé précédemment pour les noms de colonnes x et y."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "id": "opposite-disease",
+   "metadata": {
+    "id": "opposite-disease",
+    "tags": [
+     "hide"
+    ]
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.plotly.v1+json": {
+       "config": {
+        "plotlyServerURL": "https://plot.ly"
+       },
+       "data": [
+        {
+         "hovertemplate": "GOOG=%{x}<br>AAPL=%{y}<extra></extra>",
+         "legendgroup": "",
+         "marker": {
+          "color": "#636efa",
+          "symbol": "circle"
+         },
+         "mode": "markers",
+         "name": "",
+         "orientation": "v",
+         "showlegend": false,
+         "type": "scatter",
+         "x": [
+          1,
+          1.018172278347936,
+          1.032007866452698,
+          1.066782783389724,
+          1.0087731636550117,
+          0.9415276737437316,
+          0.99325918262539,
+          1.0222821547641083,
+          0.9788520214265992,
+          1.0524482730908842,
+          1.0303929312465263,
+          0.926821104067592,
+          0.9360932452590338,
+          0.913638710861412,
+          0.93380695379017,
+          0.9734447261178653,
+          0.9345146364100892,
+          0.9509902470625956,
+          0.9963982380519172,
+          0.9674568868105002,
+          0.9758943718805396,
+          1.015668254641377,
+          1.0169111849053498,
+          1.0453898287179595,
+          1.0483111519067918,
+          1.0121753574512644,
+          1.0344211867653972,
+          1.0785588920381208,
+          1.075011617811375,
+          1.1236312044424703,
+          1.1102129167272332,
+          1.1228237368393843,
+          1.0895729410299655,
+          1.1074367837463466,
+          1.1052048693141154,
+          1.0567939333314087,
+          1.0637798374890872,
+          1.0579370795194665,
+          1.0827776350267664,
+          1.0500077089175164,
+          1.007121903906116,
+          0.9947651405743836,
+          0.9720929301886708,
+          0.959681788913054,
+          0.9672663993407256,
+          0.9630385756700248,
+          0.9289168536315806,
+          0.992923504040418,
+          0.9404389054995582,
+          0.945446952912676,
+          0.8886892896888904,
+          0.9408925313390586,
+          0.9714034098401132,
+          0.9591373489949891,
+          0.9963982380519172,
+          0.989802500200548,
+          1.0077298024501202,
+          0.9934950771344468,
+          1.0103608540932627,
+          1.0073850422758417,
+          1.035165084150587,
+          1.0363716889645844,
+          1.0746032883264525,
+          1.0936918990354445,
+          1.064487521016258,
+          1.095188886079836,
+          1.1049145977684258,
+          1.1216987538299403,
+          1.1541874899828073,
+          1.075456162061569,
+          1.0562859304552756,
+          1.0544986709579427,
+          1.0283425342867192,
+          1.001270175031893,
+          0.9671666152648106,
+          0.98468558802946,
+          1.0178275181736574,
+          0.980657443195294,
+          1.0266368965939394,
+          1.0387124690620373,
+          1.025285100664745,
+          1.1344366027859267,
+          1.0832494231376286,
+          1.0778240762422375,
+          1.068379555417282,
+          1.0445098208996275,
+          1.0779056980467905,
+          1.0931748145700046,
+          1.12459294475006,
+          1.115856106545024,
+          1.1114649285805127,
+          1.0968672799119472,
+          1.10271900878617,
+          1.129972884606169,
+          1.1477913211905195,
+          1.155602744537941,
+          1.189742629754999,
+          1.2110630442115171,
+          1.1751993590303178,
+          1.183927115646047,
+          1.216279741365772,
+          1.222820990588552,
+          1.22441776261611,
+          1.2265044859331442,
+          1.213013658002661
+         ],
+         "xaxis": "x",
+         "y": [
+          1,
+          1.0119428342857142,
+          1.0197714685714288,
+          0.9800571142857144,
+          0.9171428571428571,
+          0.8937714514285715,
+          0.9853142457142856,
+          1.002857142857143,
+          1.006914325714286,
+          1.02845712,
+          1.0172571657142857,
+          0.9425142971428572,
+          0.9587428514285714,
+          0.9621714571428572,
+          0.99845712,
+          0.9469714342857144,
+          0.9275428971428572,
+          1.0504571542857144,
+          1.07765712,
+          1.06462856,
+          1.0776000114285715,
+          1.0870857428571428,
+          1.0954285542857145,
+          1.0790856914285714,
+          1.0566857028571428,
+          1.0577714342857143,
+          1.0741142914285715,
+          1.093314297142857,
+          1.0939428685714283,
+          1.0913142628571428,
+          1.1885143142857142,
+          1.1858857085714285,
+          1.2433142971428572,
+          1.235200022857143,
+          1.3007428857142855,
+          1.2645714457142856,
+          1.279085691428571,
+          1.2437714514285716,
+          1.2899428857142856,
+          1.2816571028571428,
+          1.2692000057142856,
+          1.253199988571429,
+          1.236000017142857,
+          1.1855999771428571,
+          1.1684000057142856,
+          1.1058857085714286,
+          0.9845142457142856,
+          1.0204571542857144,
+          0.9628000285714284,
+          0.9455999771428572,
+          0.8613142628571429,
+          0.8927428342857143,
+          0.8471999714285714,
+          0.8702285314285714,
+          0.8961143257142857,
+          0.9014856857142858,
+          0.95154288,
+          0.9737714514285716,
+          0.97382856,
+          0.9884000057142855,
+          0.9998285771428572,
+          0.9880571657142858,
+          1.0635428285714286,
+          1.0917143028571428,
+          1.0854285542857145,
+          1.1257142857142857,
+          1.1363999714285713,
+          1.1649142914285715,
+          1.1674285885714286,
+          1.21,
+          1.126742817142857,
+          1.08,
+          1.02268572,
+          1.00040004,
+          1.0865713942857145,
+          1.1013714571428572,
+          1.135885708571429,
+          1.130971417142857,
+          1.167028548571429,
+          1.1617143028571428,
+          1.15765712,
+          1.1870857428571429,
+          1.1658285942857145,
+          1.1485143142857142,
+          1.18,
+          1.1579428514285717,
+          1.1928000285714286,
+          1.218628542857143,
+          1.25,
+          1.2441714057142856,
+          1.25040004,
+          1.2971999714285716,
+          1.3497714685714286,
+          1.3509143085714286,
+          1.409028582857143,
+          1.4618286114285712,
+          1.4865143714285716,
+          1.5186286285714288,
+          1.4958857085714288,
+          1.5271428571428571,
+          1.5469142342857145,
+          1.57228568,
+          1.5968000114285714,
+          1.6559999314285714,
+          1.6779999657142857
+         ],
+         "yaxis": "y"
+        },
+        {
+         "hovertemplate": "<b>OLS trendline</b><br>AAPL = 1.95191 * GOOG + -0.90356<br>R<sup>2</sup>=0.694937<br><br>GOOG=%{x}<br>AAPL=%{y} <b>(trend)</b><extra></extra>",
+         "legendgroup": "",
+         "marker": {
+          "color": "#636efa",
+          "symbol": "circle"
+         },
+         "mode": "lines",
+         "name": "",
+         "showlegend": false,
+         "type": "scatter",
+         "x": [
+          0.8886892896888904,
+          0.913638710861412,
+          0.926821104067592,
+          0.9289168536315806,
+          0.93380695379017,
+          0.9345146364100892,
+          0.9360932452590338,
+          0.9404389054995582,
+          0.9408925313390586,
+          0.9415276737437316,
+          0.945446952912676,
+          0.9509902470625956,
+          0.9591373489949891,
+          0.959681788913054,
+          0.9630385756700248,
+          0.9671666152648106,
+          0.9672663993407256,
+          0.9674568868105002,
+          0.9714034098401132,
+          0.9720929301886708,
+          0.9734447261178653,
+          0.9758943718805396,
+          0.9788520214265992,
+          0.980657443195294,
+          0.98468558802946,
+          0.989802500200548,
+          0.992923504040418,
+          0.99325918262539,
+          0.9934950771344468,
+          0.9947651405743836,
+          0.9963982380519172,
+          0.9963982380519172,
+          1,
+          1.001270175031893,
+          1.007121903906116,
+          1.0073850422758417,
+          1.0077298024501202,
+          1.0087731636550117,
+          1.0103608540932627,
+          1.0121753574512644,
+          1.015668254641377,
+          1.0169111849053498,
+          1.0178275181736574,
+          1.018172278347936,
+          1.0222821547641083,
+          1.025285100664745,
+          1.0266368965939394,
+          1.0283425342867192,
+          1.0303929312465263,
+          1.032007866452698,
+          1.0344211867653972,
+          1.035165084150587,
+          1.0363716889645844,
+          1.0387124690620373,
+          1.0445098208996275,
+          1.0453898287179595,
+          1.0483111519067918,
+          1.0500077089175164,
+          1.0524482730908842,
+          1.0544986709579427,
+          1.0562859304552756,
+          1.0567939333314087,
+          1.0579370795194665,
+          1.0637798374890872,
+          1.064487521016258,
+          1.066782783389724,
+          1.068379555417282,
+          1.0746032883264525,
+          1.075011617811375,
+          1.075456162061569,
+          1.0778240762422375,
+          1.0779056980467905,
+          1.0785588920381208,
+          1.0827776350267664,
+          1.0832494231376286,
+          1.0895729410299655,
+          1.0931748145700046,
+          1.0936918990354445,
+          1.095188886079836,
+          1.0968672799119472,
+          1.10271900878617,
+          1.1049145977684258,
+          1.1052048693141154,
+          1.1074367837463466,
+          1.1102129167272332,
+          1.1114649285805127,
+          1.115856106545024,
+          1.1216987538299403,
+          1.1228237368393843,
+          1.1236312044424703,
+          1.12459294475006,
+          1.129972884606169,
+          1.1344366027859267,
+          1.1477913211905195,
+          1.1541874899828073,
+          1.155602744537941,
+          1.1751993590303178,
+          1.183927115646047,
+          1.189742629754999,
+          1.2110630442115171,
+          1.213013658002661,
+          1.216279741365772,
+          1.222820990588552,
+          1.22441776261611,
+          1.2265044859331442
+         ],
+         "xaxis": "x",
+         "y": [
+          0.8310783215620523,
+          0.8797772608170551,
+          0.9055080608041248,
+          0.9095987681598043,
+          0.9191437868168426,
+          0.9205251171764113,
+          0.9236064141696589,
+          0.9320887369703681,
+          0.9329741722295499,
+          0.9342139108659522,
+          0.941863977649146,
+          0.9526839699532905,
+          0.9685863517907867,
+          0.9696490476471153,
+          0.9762011817924061,
+          0.9842587294236165,
+          0.9844534986175788,
+          0.984825312362485,
+          0.9925285566164743,
+          0.9938744359191365,
+          0.9965130152827935,
+          1.0012944949559226,
+          1.0070675505544942,
+          1.0105915651773327,
+          1.0184541275683776,
+          1.0284418620841365,
+          1.0345337700030204,
+          1.0351889832404626,
+          1.035649427283942,
+          1.038128472464341,
+          1.0413161261700508,
+          1.0413161261700508,
+          1.0483464290018394,
+          1.0508256919993115,
+          1.0622477200701024,
+          1.0627613415843782,
+          1.0634342812357087,
+          1.0654708248327198,
+          1.0685698482398558,
+          1.0721115892765836,
+          1.0789293982713912,
+          1.0813554820271971,
+          1.0831440789594495,
+          1.0838170186107805,
+          1.0918391134142131,
+          1.097700583265154,
+          1.1003391626288108,
+          1.103668408057687,
+          1.1076705913670244,
+          1.110822794015827,
+          1.1155333698042722,
+          1.1169853880023224,
+          1.1193405678734436,
+          1.1239095519387226,
+          1.1352254411141245,
+          1.136943134161692,
+          1.1426452841047081,
+          1.1459568048905657,
+          1.1507205581498066,
+          1.154722743230014,
+          1.1582113067959456,
+          1.1592028809505162,
+          1.1614341955123595,
+          1.1728387132154645,
+          1.1742200453459035,
+          1.1787001830664061,
+          1.1818169328874308,
+          1.1939650780803488,
+          1.1947620990871597,
+          1.1956298079324532,
+          1.2002517551931953,
+          1.2004110733302507,
+          1.2016860469773571,
+          1.2099206391595114,
+          1.2108415254756002,
+          1.2231844416333506,
+          1.2302149622822123,
+          1.231224262850672,
+          1.2341462417068643,
+          1.2374223096649448,
+          1.2488443377357354,
+          1.2531299223084789,
+          1.2536965052473472,
+          1.2580529937047746,
+          1.2634717459261249,
+          1.2659155560958197,
+          1.2744867252413052,
+          1.2858910268982076,
+          1.288086888632273,
+          1.2896629899566747,
+          1.2915402171875008,
+          1.302041357171332,
+          1.3107541180399847,
+          1.3368212807150535,
+          1.3493060046421732,
+          1.3520684493151074,
+          1.3903192100108717,
+          1.407354975543178,
+          1.418706315775487,
+          1.4603217729570344,
+          1.4641291888432795,
+          1.4705042784376263,
+          1.4832721858110784,
+          1.4863889356321032,
+          1.4904620245969955
+         ],
+         "yaxis": "y"
+        }
+       ],
+       "layout": {
+        "legend": {
+         "tracegroupgap": 0
+        },
+        "template": {
+         "data": {
+          "bar": [
+           {
+            "error_x": {
+             "color": "#2a3f5f"
+            },
+            "error_y": {
+             "color": "#2a3f5f"
+            },
+            "marker": {
+             "line": {
+              "color": "#E5ECF6",
+              "width": 0.5
+             },
+             "pattern": {
+              "fillmode": "overlay",
+              "size": 10,
+              "solidity": 0.2
+             }
+            },
+            "type": "bar"
+           }
+          ],
+          "barpolar": [
+           {
+            "marker": {
+             "line": {
+              "color": "#E5ECF6",
+              "width": 0.5
+             },
+             "pattern": {
+              "fillmode": "overlay",
+              "size": 10,
+              "solidity": 0.2
+             }
+            },
+            "type": "barpolar"
+           }
+          ],
+          "carpet": [
+           {
+            "aaxis": {
+             "endlinecolor": "#2a3f5f",
+             "gridcolor": "white",
+             "linecolor": "white",
+             "minorgridcolor": "white",
+             "startlinecolor": "#2a3f5f"
+            },
+            "baxis": {
+             "endlinecolor": "#2a3f5f",
+             "gridcolor": "white",
+             "linecolor": "white",
+             "minorgridcolor": "white",
+             "startlinecolor": "#2a3f5f"
+            },
+            "type": "carpet"
+           }
+          ],
+          "choropleth": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "type": "choropleth"
+           }
+          ],
+          "contour": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "contour"
+           }
+          ],
+          "contourcarpet": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "type": "contourcarpet"
+           }
+          ],
+          "heatmap": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "heatmap"
+           }
+          ],
+          "heatmapgl": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "heatmapgl"
+           }
+          ],
+          "histogram": [
+           {
+            "marker": {
+             "pattern": {
+              "fillmode": "overlay",
+              "size": 10,
+              "solidity": 0.2
+             }
+            },
+            "type": "histogram"
+           }
+          ],
+          "histogram2d": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "histogram2d"
+           }
+          ],
+          "histogram2dcontour": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "histogram2dcontour"
+           }
+          ],
+          "mesh3d": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "type": "mesh3d"
+           }
+          ],
+          "parcoords": [
+           {
+            "line": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "parcoords"
+           }
+          ],
+          "pie": [
+           {
+            "automargin": true,
+            "type": "pie"
+           }
+          ],
+          "scatter": [
+           {
+            "fillpattern": {
+             "fillmode": "overlay",
+             "size": 10,
+             "solidity": 0.2
+            },
+            "type": "scatter"
+           }
+          ],
+          "scatter3d": [
+           {
+            "line": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scatter3d"
+           }
+          ],
+          "scattercarpet": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scattercarpet"
+           }
+          ],
+          "scattergeo": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scattergeo"
+           }
+          ],
+          "scattergl": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scattergl"
+           }
+          ],
+          "scattermapbox": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scattermapbox"
+           }
+          ],
+          "scatterpolar": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scatterpolar"
+           }
+          ],
+          "scatterpolargl": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scatterpolargl"
+           }
+          ],
+          "scatterternary": [
+           {
+            "marker": {
+             "colorbar": {
+              "outlinewidth": 0,
+              "ticks": ""
+             }
+            },
+            "type": "scatterternary"
+           }
+          ],
+          "surface": [
+           {
+            "colorbar": {
+             "outlinewidth": 0,
+             "ticks": ""
+            },
+            "colorscale": [
+             [
+              0,
+              "#0d0887"
+             ],
+             [
+              0.1111111111111111,
+              "#46039f"
+             ],
+             [
+              0.2222222222222222,
+              "#7201a8"
+             ],
+             [
+              0.3333333333333333,
+              "#9c179e"
+             ],
+             [
+              0.4444444444444444,
+              "#bd3786"
+             ],
+             [
+              0.5555555555555556,
+              "#d8576b"
+             ],
+             [
+              0.6666666666666666,
+              "#ed7953"
+             ],
+             [
+              0.7777777777777778,
+              "#fb9f3a"
+             ],
+             [
+              0.8888888888888888,
+              "#fdca26"
+             ],
+             [
+              1,
+              "#f0f921"
+             ]
+            ],
+            "type": "surface"
+           }
+          ],
+          "table": [
+           {
+            "cells": {
+             "fill": {
+              "color": "#EBF0F8"
+             },
+             "line": {
+              "color": "white"
+             }
+            },
+            "header": {
+             "fill": {
+              "color": "#C8D4E3"
+             },
+             "line": {
+              "color": "white"
+             }
+            },
+            "type": "table"
+           }
+          ]
+         },
+         "layout": {
+          "annotationdefaults": {
+           "arrowcolor": "#2a3f5f",
+           "arrowhead": 0,
+           "arrowwidth": 1
+          },
+          "autotypenumbers": "strict",
+          "coloraxis": {
+           "colorbar": {
+            "outlinewidth": 0,
+            "ticks": ""
+           }
+          },
+          "colorscale": {
+           "diverging": [
+            [
+             0,
+             "#8e0152"
+            ],
+            [
+             0.1,
+             "#c51b7d"
+            ],
+            [
+             0.2,
+             "#de77ae"
+            ],
+            [
+             0.3,
+             "#f1b6da"
+            ],
+            [
+             0.4,
+             "#fde0ef"
+            ],
+            [
+             0.5,
+             "#f7f7f7"
+            ],
+            [
+             0.6,
+             "#e6f5d0"
+            ],
+            [
+             0.7,
+             "#b8e186"
+            ],
+            [
+             0.8,
+             "#7fbc41"
+            ],
+            [
+             0.9,
+             "#4d9221"
+            ],
+            [
+             1,
+             "#276419"
+            ]
+           ],
+           "sequential": [
+            [
+             0,
+             "#0d0887"
+            ],
+            [
+             0.1111111111111111,
+             "#46039f"
+            ],
+            [
+             0.2222222222222222,
+             "#7201a8"
+            ],
+            [
+             0.3333333333333333,
+             "#9c179e"
+            ],
+            [
+             0.4444444444444444,
+             "#bd3786"
+            ],
+            [
+             0.5555555555555556,
+             "#d8576b"
+            ],
+            [
+             0.6666666666666666,
+             "#ed7953"
+            ],
+            [
+             0.7777777777777778,
+             "#fb9f3a"
+            ],
+            [
+             0.8888888888888888,
+             "#fdca26"
+            ],
+            [
+             1,
+             "#f0f921"
+            ]
+           ],
+           "sequentialminus": [
+            [
+             0,
+             "#0d0887"
+            ],
+            [
+             0.1111111111111111,
+             "#46039f"
+            ],
+            [
+             0.2222222222222222,
+             "#7201a8"
+            ],
+            [
+             0.3333333333333333,
+             "#9c179e"
+            ],
+            [
+             0.4444444444444444,
+             "#bd3786"
+            ],
+            [
+             0.5555555555555556,
+             "#d8576b"
+            ],
+            [
+             0.6666666666666666,
+             "#ed7953"
+            ],
+            [
+             0.7777777777777778,
+             "#fb9f3a"
+            ],
+            [
+             0.8888888888888888,
+             "#fdca26"
+            ],
+            [
+             1,
+             "#f0f921"
+            ]
+           ]
+          },
+          "colorway": [
+           "#636efa",
+           "#EF553B",
+           "#00cc96",
+           "#ab63fa",
+           "#FFA15A",
+           "#19d3f3",
+           "#FF6692",
+           "#B6E880",
+           "#FF97FF",
+           "#FECB52"
+          ],
+          "font": {
+           "color": "#2a3f5f"
+          },
+          "geo": {
+           "bgcolor": "white",
+           "lakecolor": "white",
+           "landcolor": "#E5ECF6",
+           "showlakes": true,
+           "showland": true,
+           "subunitcolor": "white"
+          },
+          "hoverlabel": {
+           "align": "left"
+          },
+          "hovermode": "closest",
+          "mapbox": {
+           "style": "light"
+          },
+          "paper_bgcolor": "white",
+          "plot_bgcolor": "#E5ECF6",
+          "polar": {
+           "angularaxis": {
+            "gridcolor": "white",
+            "linecolor": "white",
+            "ticks": ""
+           },
+           "bgcolor": "#E5ECF6",
+           "radialaxis": {
+            "gridcolor": "white",
+            "linecolor": "white",
+            "ticks": ""
+           }
+          },
+          "scene": {
+           "xaxis": {
+            "backgroundcolor": "#E5ECF6",
+            "gridcolor": "white",
+            "gridwidth": 2,
+            "linecolor": "white",
+            "showbackground": true,
+            "ticks": "",
+            "zerolinecolor": "white"
+           },
+           "yaxis": {
+            "backgroundcolor": "#E5ECF6",
+            "gridcolor": "white",
+            "gridwidth": 2,
+            "linecolor": "white",
+            "showbackground": true,
+            "ticks": "",
+            "zerolinecolor": "white"
+           },
+           "zaxis": {
+            "backgroundcolor": "#E5ECF6",
+            "gridcolor": "white",
+            "gridwidth": 2,
+            "linecolor": "white",
+            "showbackground": true,
+            "ticks": "",
+            "zerolinecolor": "white"
+           }
+          },
+          "shapedefaults": {
+           "line": {
+            "color": "#2a3f5f"
+           }
+          },
+          "ternary": {
+           "aaxis": {
+            "gridcolor": "white",
+            "linecolor": "white",
+            "ticks": ""
+           },
+           "baxis": {
+            "gridcolor": "white",
+            "linecolor": "white",
+            "ticks": ""
+           },
+           "bgcolor": "#E5ECF6",
+           "caxis": {
+            "gridcolor": "white",
+            "linecolor": "white",
+            "ticks": ""
+           }
+          },
+          "title": {
+           "x": 0.05
+          },
+          "xaxis": {
+           "automargin": true,
+           "gridcolor": "white",
+           "linecolor": "white",
+           "ticks": "",
+           "title": {
+            "standoff": 15
+           },
+           "zerolinecolor": "white",
+           "zerolinewidth": 2
+          },
+          "yaxis": {
+           "automargin": true,
+           "gridcolor": "white",
+           "linecolor": "white",
+           "ticks": "",
+           "title": {
+            "standoff": 15
+           },
+           "zerolinecolor": "white",
+           "zerolinewidth": 2
+          }
+         }
+        },
+        "title": {
+         "text": "Relation entre GDP per capita et Life Expectancy en 2007"
+        },
+        "xaxis": {
+         "anchor": "y",
+         "domain": [
+          0,
+          1
+         ],
+         "title": {
+          "text": "GOOG"
+         }
+        },
+        "yaxis": {
+         "anchor": "x",
+         "domain": [
+          0,
+          1
+         ],
+         "title": {
+          "text": "AAPL"
+         }
+        }
+       }
+      }
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "def financial_scatter_widget(df, x=None, y=None):\n",
+    "    fig = px.scatter(\n",
+    "    df,\n",
+    "    x=x,\n",
+    "    y=y,\n",
+    "    trendline='ols',\n",
+    "    title=\"Relation entre GDP per capita et Life Expectancy en 2007\"\n",
+    ")\n",
+    "fig.show()\n",
+    "\n",
+    "financial_scatter_widget(df, x=\"GOOG\", y=\"AAPL\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "asian-twelve",
+   "metadata": {
+    "id": "asian-twelve",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "f) L'idée est de donner la main à l'utilisateur pour choisir quel indice il souhaite vérifier la correlation avec l'indice APPL.\n",
+    "\n",
+    "Créez un widget de type Dropdown, qui permettra de sélectionner le nom d'une colonne du DataFrame créé."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "accessory-reply",
+   "metadata": {
+    "id": "accessory-reply",
+    "tags": [
+     "hide"
+    ]
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "83d7f0de40c541f9afba4fc8dce74e7c",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "Dropdown(description='AAPL vs ', index=2, options=('date', 'GOOG', 'AAPL', 'AMZN', 'FB', 'NFLX', 'MSFT'), styl…"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "x_dropdown = widgets.Dropdown(\n",
+    "    options=df.columns,\n",
+    "    value='AAPL',\n",
+    "    description='AAPL vs ',\n",
+    "    style= {'description_width': 'initial'},\n",
+    "    disabled=False,\n",
+    ")\n",
+    "display(x_dropdown)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "regular-paris",
+   "metadata": {
+    "id": "regular-paris",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "g) A l'aide de la fonction `interact()` de widgets, faites exécutez la fonction `financial_scatter_widget` en fonction de la colonne choisie.\n",
+    "\n",
+    "On fixera les paramètres `df`=Le DataFrame récupéré de l'upload  et `y`=\"APPL\" à l'aide de la fonction `fixed()`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 35,
+   "id": "instant-denial",
+   "metadata": {
+    "id": "instant-denial",
+    "tags": [
+     "hide"
+    ]
+   },
+   "outputs": [
+    {
+     "ename": "ValueError",
+     "evalue": "None cannot be transformed to a widget",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mValueError\u001b[0m                                Traceback (most recent call last)",
+      "Cell \u001b[0;32mIn[35], line 1\u001b[0m\n\u001b[0;32m----> 1\u001b[0m \u001b[43mwidgets\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43minteract\u001b[49m\u001b[43m(\u001b[49m\n\u001b[1;32m      2\u001b[0m \u001b[43m    \u001b[49m\u001b[43mfinancial_scatter_widget\u001b[49m\u001b[43m,\u001b[49m\n\u001b[1;32m      3\u001b[0m \u001b[43m    \u001b[49m\u001b[43mx\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43mdf\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mcolumns\u001b[49m\u001b[43m,\u001b[49m\n\u001b[1;32m      4\u001b[0m \u001b[43m    \u001b[49m\u001b[43mdf\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43m \u001b[49m\u001b[43mfixed\u001b[49m\u001b[43m(\u001b[49m\u001b[43mdf\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m      5\u001b[0m \u001b[43m    \u001b[49m\n\u001b[1;32m      6\u001b[0m \u001b[43m    \u001b[49m\u001b[38;5;66;43;03m# à compléter\u001b[39;49;00m\n\u001b[1;32m      7\u001b[0m \u001b[43m)\u001b[49m\n",
+      "File \u001b[0;32m/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/ipywidgets/widgets/interaction.py:536\u001b[0m, in \u001b[0;36m_InteractFactory.__call__\u001b[0;34m(self, _InteractFactory__interact_f, **kwargs)\u001b[0m\n\u001b[1;32m    528\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[38;5;28mself\u001b[39m\n\u001b[1;32m    530\u001b[0m \u001b[38;5;66;03m# positional arg support in: https://gist.github.com/8851331\u001b[39;00m\n\u001b[1;32m    531\u001b[0m \u001b[38;5;66;03m# Handle the cases 1 and 2\u001b[39;00m\n\u001b[1;32m    532\u001b[0m \u001b[38;5;66;03m# 1. interact(f, **kwargs)\u001b[39;00m\n\u001b[1;32m    533\u001b[0m \u001b[38;5;66;03m# 2. @interact\u001b[39;00m\n\u001b[1;32m    534\u001b[0m \u001b[38;5;66;03m#    def f(*args, **kwargs):\u001b[39;00m\n\u001b[1;32m    535\u001b[0m \u001b[38;5;66;03m#        ...\u001b[39;00m\n\u001b[0;32m--> 536\u001b[0m w \u001b[38;5;241m=\u001b[39m \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mwidget\u001b[49m\u001b[43m(\u001b[49m\u001b[43mf\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    537\u001b[0m \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[1;32m    538\u001b[0m     f\u001b[38;5;241m.\u001b[39mwidget \u001b[38;5;241m=\u001b[39m w\n",
+      "File \u001b[0;32m/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/ipywidgets/widgets/interaction.py:452\u001b[0m, in \u001b[0;36m_InteractFactory.widget\u001b[0;34m(self, f)\u001b[0m\n\u001b[1;32m    436\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;21mwidget\u001b[39m(\u001b[38;5;28mself\u001b[39m, f):\n\u001b[1;32m    437\u001b[0m \u001b[38;5;250m    \u001b[39m\u001b[38;5;124;03m\"\"\"\u001b[39;00m\n\u001b[1;32m    438\u001b[0m \u001b[38;5;124;03m    Return an interactive function widget for the given function.\u001b[39;00m\n\u001b[1;32m    439\u001b[0m \n\u001b[0;32m   (...)\u001b[0m\n\u001b[1;32m    450\u001b[0m \u001b[38;5;124;03m        The function to which the interactive widgets are tied.\u001b[39;00m\n\u001b[1;32m    451\u001b[0m \u001b[38;5;124;03m    \"\"\"\u001b[39;00m\n\u001b[0;32m--> 452\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mcls\u001b[49m\u001b[43m(\u001b[49m\u001b[43mf\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mopts\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;241;43m*\u001b[39;49m\u001b[38;5;241;43m*\u001b[39;49m\u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n",
+      "File \u001b[0;32m/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/ipywidgets/widgets/interaction.py:187\u001b[0m, in \u001b[0;36minteractive.__init__\u001b[0;34m(self, _interactive__interact_f, _interactive__options, **kwargs)\u001b[0m\n\u001b[1;32m    185\u001b[0m     getcallargs(f, \u001b[38;5;241m*\u001b[39m\u001b[38;5;241m*\u001b[39m{n:v \u001b[38;5;28;01mfor\u001b[39;00m n,v,_ \u001b[38;5;129;01min\u001b[39;00m new_kwargs})\n\u001b[1;32m    186\u001b[0m \u001b[38;5;66;03m# Now build the widgets from the abbreviations.\u001b[39;00m\n\u001b[0;32m--> 187\u001b[0m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mkwargs_widgets \u001b[38;5;241m=\u001b[39m \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mwidgets_from_abbreviations\u001b[49m\u001b[43m(\u001b[49m\u001b[43mnew_kwargs\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    189\u001b[0m \u001b[38;5;66;03m# This has to be done as an assignment, not using self.children.append,\u001b[39;00m\n\u001b[1;32m    190\u001b[0m \u001b[38;5;66;03m# so that traitlets notices the update. We skip any objects (such as fixed) that\u001b[39;00m\n\u001b[1;32m    191\u001b[0m \u001b[38;5;66;03m# are not DOMWidgets.\u001b[39;00m\n\u001b[1;32m    192\u001b[0m c \u001b[38;5;241m=\u001b[39m [w \u001b[38;5;28;01mfor\u001b[39;00m w \u001b[38;5;129;01min\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mkwargs_widgets \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28misinstance\u001b[39m(w, DOMWidget)]\n",
+      "File \u001b[0;32m/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/ipywidgets/widgets/interaction.py:288\u001b[0m, in \u001b[0;36minteractive.widgets_from_abbreviations\u001b[0;34m(self, seq)\u001b[0m\n\u001b[1;32m    286\u001b[0m widget \u001b[38;5;241m=\u001b[39m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mwidget_from_abbrev(abbrev, default)\n\u001b[1;32m    287\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m widget \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[0;32m--> 288\u001b[0m     \u001b[38;5;28;01mraise\u001b[39;00m \u001b[38;5;167;01mValueError\u001b[39;00m(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;132;01m{!r}\u001b[39;00m\u001b[38;5;124m cannot be transformed to a widget\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;241m.\u001b[39mformat(abbrev))\n\u001b[1;32m    289\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m \u001b[38;5;28mhasattr\u001b[39m(widget, \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mdescription\u001b[39m\u001b[38;5;124m\"\u001b[39m) \u001b[38;5;129;01mor\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m widget\u001b[38;5;241m.\u001b[39mdescription:\n\u001b[1;32m    290\u001b[0m     widget\u001b[38;5;241m.\u001b[39mdescription \u001b[38;5;241m=\u001b[39m name\n",
+      "\u001b[0;31mValueError\u001b[0m: None cannot be transformed to a widget"
+     ]
+    }
+   ],
+   "source": [
+    "widgets.interact(\n",
+    "    financial_scatter_widget,\n",
+    "    x=df.columns,\n",
+    "    df = fixed(df)\n",
+    "    \n",
+    "    # à compléter\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "helpful-egyptian",
+   "metadata": {
+    "id": "helpful-egyptian",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "# 3) Transformation du notebook en application web avec Voilà"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "genuine-corner",
+   "metadata": {
+    "id": "genuine-corner",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "Voici un dashboard permettant de créer un graphe aléatoire, nous allons convertir notre notebook en application web pour qu'on puisse l'exécuter en local et pouvoir interragir avec les éléments."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "id": "7850edda",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "21bc0b39710248aba9a9480edc92d4ac",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "interactive(children=(IntSlider(value=16, description='n', max=30, min=2), IntSlider(value=5, description='m',…"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "from ipywidgets import interact\n",
+    "%matplotlib inline\n",
+    "import matplotlib.pyplot as plt\n",
+    "import networkx as nx\n",
+    "\n",
+    "def random_lobster(n, m, k, p):\n",
+    "    return nx.random_lobster(n, p, p / m)\n",
+    "\n",
+    "def powerlaw_cluster(n, m, k, p):\n",
+    "    return nx.powerlaw_cluster_graph(n, m, p)\n",
+    "\n",
+    "def erdos_renyi(n, m, k, p):\n",
+    "    return nx.erdos_renyi_graph(n, p)\n",
+    "\n",
+    "def newman_watts_strogatz(n, m, k, p):\n",
+    "    return nx.newman_watts_strogatz_graph(n, k, p)\n",
+    "\n",
+    "def plot_random_graph(n, m, k, p, generator):\n",
+    "    g = generator(n, m, k, p)\n",
+    "    nx.draw(g)\n",
+    "    plt.show()\n",
+    "\n",
+    "interact(plot_random_graph, n=(2,30), m=(1,10), k=(1,10), p=(0.0, 0.99, 0.001),\n",
+    "         generator=[\n",
+    "             ('lobster', random_lobster),\n",
+    "             ('power law', powerlaw_cluster),\n",
+    "             ('Newman-Watts-Strogatz', newman_watts_strogatz),\n",
+    "             (u'Erdős-Rényi', erdos_renyi),\n",
+    "         ]);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ancient-staff",
+   "metadata": {
+    "id": "ancient-staff",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "a) Commencez par installer [Voila](https://github.com/voila-dashboards/voila)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "id": "dietary-postcard",
+   "metadata": {
+    "id": "dietary-postcard",
+    "tags": [
+     "hide"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "#import sys\n",
+    "!#{sys.executable} -m pip install voila"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "swiss-diploma",
+   "metadata": {
+    "id": "swiss-diploma",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "b) Marquez toutes les cellules pour ne garder que les cellules de l'exercice 3, afin de n'afficher que le dashboard de cette partie.\n",
+    "\n",
+    "Pour ce faire, vous devrez taggez au préalable les cellules avec un nom de tag. On choisira le tag `hide` dans cet exemple.\n",
+    "\n",
+    "Pour cela, cliquez sur \"Affichage\"-> \"Barre d'outil de cellule\" -> \"Tags\"\n",
+    "\n",
+    "(Ah... attendez, c'est déjà fait ! On vous fait gagner du temps)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "shaped-practitioner",
+   "metadata": {
+    "id": "shaped-practitioner",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "c) Depuis un terminal, lancez la commande :\n",
+    "```\n",
+    "voila --TagRemovePreprocessor.remove_cell_tags hide td_dataviz_webapp.ipynb --show_tracebacks=True\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "present-parliament",
+   "metadata": {
+    "id": "present-parliament",
+    "tags": [
+     "hide"
+    ]
+   },
+   "source": [
+    "# [Bonus] Déploiement d'une webapp avec Binder\n",
+    "\n",
+    "Pour pouvoir utiliser [Binder](https://jupyter.org/binder), il faut au préalable avoir pushé son notebook dans un repo git et avoir rajouté un fichier 'requirements.txt' contenant les librairies nécessaires pour faire tourner votre projet.\n",
+    "\n",
+    "Ensuite, il suffit d'aller sur https://mybinder.org/ et :\n",
+    "- dans 'GitHub', copier coller l'URL de votre projet git\n",
+    "- dans 'Path to a notebook file (optional)', écrivez 'voila/render/ce_notebook.ipynb' en précisant bien 'URL' au lieu de 'File'. Celà permet de spécifier à Binder qu'il faut directement utiliser Voila pour créer la webapp.\n",
+    "\n",
+    "Cliquez ensuite sur 'lauch'. Une image docker de votre projet sera créer grace au fichier 'requirements.txt'. Vous aurez ensuite un lien pour lancer un conteneur docker autonome qui vous permettra d'acceder à votre application web. Pour chaque utilisateur utilisant ce lien, un conteneur docker sera créé."
+   ]
+  }
+ ],
+ "metadata": {
+  "celltoolbar": "Format de la Cellule Texte Brut",
+  "colab": {
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.13.1"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
