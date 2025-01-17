@@ -1,0 +1,5 @@
+networkx 
+ipywidgets 
+statsmodels
+pandas
+matplotlib
