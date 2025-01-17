@@ -3,3 +3,6 @@ ipywidgets
 statsmodels
 pandas
 matplotlib
+streamlit
+plotly
+voila
